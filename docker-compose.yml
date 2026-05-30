@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mess-backend
+    env_file:
+      - ./backend/.env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:-thisIsAVeryLongSecretKeyForMessManagementApplication123456}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      AGENT_API_KEY: ${AGENT_API_KEY:-agent-secret-key-change-me}
+      AGENT_URL: http://mess-agent:8000
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend/logs:/app/logs
+    networks:
+      - mess-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 60s
+
+  agent:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
+    container_name: mess-agent
+    env_file:
+      - ./agent/.env
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      LITELLM_API_KEY: ${LITELLM_API_KEY}
+      LITELLM_MODEL_NAME: ${LITELLM_MODEL_NAME:-gemini/gemini-1.5-flash}
+      LITELLM_BASE_URL: ${LITELLM_BASE_URL:-}
+      BACKEND_API_URL: http://mess-backend:8080/api
+      BACKEND_API_KEY: ${BACKEND_API_KEY:-agent-secret-key-change-me}
+      DATABASE_URL: ${DATABASE_URL}
+      AGENT_PORT: 8000
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - mess-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+networks:
+  mess-network:
+    driver: bridge

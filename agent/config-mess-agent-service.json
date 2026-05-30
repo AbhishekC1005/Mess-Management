@@ -1,0 +1,26 @@
+{
+  "cluster": "mess-cluster",
+  "serviceName": "mess-agent-service",
+  "taskDefinition": "mess-agent-task",
+  "loadBalancers": [
+    {
+      "targetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:037931886769:targetgroup/tg-mess-agent/6b96681a2acd7473",
+      "containerName": "mess-agent",
+      "containerPort": 8000
+    }
+  ],
+  "desiredCount": 1,
+  "launchType": "FARGATE",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": [
+        "subnet-006c2f5f0cf8a9b5d",
+        "subnet-0e334a930dd83c739"
+      ],
+      "securityGroups": [
+        "sg-00636c690b95182c0"
+      ],
+      "assignPublicIp": "ENABLED"
+    }
+  }
+}

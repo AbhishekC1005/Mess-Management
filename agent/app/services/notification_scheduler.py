@@ -28,9 +28,6 @@ class NotificationScheduler:
         self._running = True
         logger.info("Starting notification scheduler")
 
-        # Schedule daily reminders (30 minutes before cutoff)
-        self._schedule_daily_reminders()
-
         # Schedule payment due alerts (daily at 9 AM)
         self._schedule_payment_alerts()
 
@@ -44,24 +41,6 @@ class NotificationScheduler:
             task.cancel()
             logger.info(f"Cancelled task: {name}")
         self._tasks.clear()
-
-    def _schedule_daily_reminders(self):
-        """Schedule daily meal reminder notifications."""
-        async def reminder_task():
-            while self._running:
-                try:
-                    # Use a default wait — reminders triggered when sending
-                    await asyncio.sleep(3600)  # Check every hour
-
-                    if self._running:
-                        await self._send_daily_reminders()
-
-                except Exception as e:
-                    logger.error(f"Error in reminder task: {e}", exc_info=True)
-                    await asyncio.sleep(3600)  # Retry after 1 hour
-
-        task = asyncio.create_task(reminder_task())
-        self._tasks["daily_reminders"] = task
 
     def _schedule_payment_alerts(self):
         """Schedule daily payment due alerts."""
@@ -108,56 +87,6 @@ class NotificationScheduler:
 
         task = asyncio.create_task(expiry_warning_task())
         self._tasks["expiry_warnings"] = task
-
-    async def _send_daily_reminders(self):
-        """Send daily meal reminder to all active customers."""
-        try:
-            # Get all customers with linked Telegram IDs
-            customers = await backend_client.get_all_customers()
-
-            for customer in customers:
-                if customer.get("telegramChatId") and customer.get("status") == "Active":
-                    chat_id = customer["telegramChatId"]
-
-                    # Get today's menu
-                    mess_id = customer.get("messId")
-                    menu = await backend_client.get_today_menu(mess_id=str(mess_id) if mess_id else None)
-
-                    # Create skip buttons
-                    keyboard = [
-                        [
-                            InlineKeyboardButton("Skip Lunch", callback_data=f"skip_lunch_{customer['id']}"),
-                            InlineKeyboardButton("Skip Dinner", callback_data=f"skip_dinner_{customer['id']}")
-                        ],
-                        [
-                            InlineKeyboardButton("Skip Both", callback_data=f"skip_both_{customer['id']}")
-                        ]
-                    ]
-
-                    message = (
-                        f"🍽️ *Daily Reminder - {datetime.now().strftime('%A, %B %d')}*\n\n"
-                        f"📅 *Today's Menu:*\n{menu}\n\n"
-                        f"⏰ *Reminder:* Skip before cutoff time to avoid being charged!\n\n"
-                        f"Need to skip a meal? Use the buttons below or just tell me!"
-                    )
-
-                    try:
-                        await self.bot_app.bot.send_message(
-                            chat_id=chat_id,
-                            text=message,
-                            parse_mode="Markdown",
-                            reply_markup=InlineKeyboardMarkup(keyboard)
-                        )
-                        logger.info(f"Sent daily reminder to {customer['name']}")
-
-                        # Add delay to avoid rate limiting
-                        await asyncio.sleep(0.5)
-
-                    except Exception as e:
-                        logger.error(f"Failed to send reminder to {customer['name']}: {e}")
-
-        except Exception as e:
-            logger.error(f"Error sending daily reminders: {e}", exc_info=True)
 
     async def _send_payment_alerts(self):
         """Send payment due alerts to customers with outstanding dues."""

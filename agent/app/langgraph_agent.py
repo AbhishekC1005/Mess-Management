@@ -2,7 +2,7 @@ import logging
 import json
 from datetime import date
 from typing import TypedDict, Optional, Annotated
-from langchain_nvidia_ai_endpoints import ChatNVIDIA
+from langchain_litellm import ChatLiteLLM
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
@@ -61,10 +61,22 @@ class AgentState(TypedDict):
 
 def create_agent_graph():
     """Create the LangGraph agent for processing user messages."""
+    import os
+    if settings.litellm_api_key:
+        model_lower = settings.litellm_model_name.lower()
+        if model_lower.startswith("gemini"):
+            os.environ["GEMINI_API_KEY"] = settings.litellm_api_key
+        elif model_lower.startswith("openai"):
+            os.environ["OPENAI_API_KEY"] = settings.litellm_api_key
+        elif model_lower.startswith("anthropic"):
+            os.environ["ANTHROPIC_API_KEY"] = settings.litellm_api_key
+        elif model_lower.startswith("cohere"):
+            os.environ["COHERE_API_KEY"] = settings.litellm_api_key
 
-    llm = ChatNVIDIA(
-        model=settings.nvidia_nim_model,
-        api_key=settings.nvidia_nim_api_key,
+    llm = ChatLiteLLM(
+        model=settings.litellm_model_name,
+        api_key=settings.litellm_api_key,
+        api_base=settings.litellm_base_url if settings.litellm_base_url else None,
         temperature=0.1,
         max_tokens=512,
     )

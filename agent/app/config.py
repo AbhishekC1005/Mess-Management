@@ -4,8 +4,9 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     telegram_bot_token: str = ""
-    nvidia_nim_api_key: str = ""
-    nvidia_nim_model: str = "meta/llama-3.1-70b-instruct"
+    litellm_api_key: str = ""
+    litellm_model_name: str = "gemini/gemini-1.5-flash"
+    litellm_base_url: str = ""
     backend_api_url: str = "http://localhost:8080/api"
     backend_api_key: str = "default-agent-key-change-me"
     agent_port: int = 8000

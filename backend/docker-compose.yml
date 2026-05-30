@@ -2,13 +2,15 @@ services:
   app:
     build: .
     container_name: mess-backend
+    env_file:
+      - .env
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      DB_URL: jdbc:postgresql://db-mess-management.c18gwquak8j5.ap-south-1.rds.amazonaws.com:5432/postgres
-      DB_USERNAME: postgres
-      DB_PASSWORD: abhishek4
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:-thisIsAVeryLongSecretKeyForMessManagementApplication123456}
-      CORS_ORIGINS: http://localhost:5173
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
       AGENT_API_KEY: ${AGENT_API_KEY:-agent-secret-key-change-me}
     ports:
       - "8080:8080"

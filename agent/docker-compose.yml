@@ -6,10 +6,12 @@ services:
       - .env
     environment:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
-      NVIDIA_NIM_API_KEY: ${NVIDIA_NIM_API_KEY}
-      NVIDIA_NIM_MODEL: ${NVIDIA_NIM_MODEL:-meta/llama-3.1-70b-instruct}
+      LITELLM_API_KEY: ${LITELLM_API_KEY}
+      LITELLM_MODEL_NAME: ${LITELLM_MODEL_NAME:-gemini/gemini-1.5-flash}
+      LITELLM_BASE_URL: ${LITELLM_BASE_URL:-}
       BACKEND_API_URL: ${BACKEND_API_URL:-http://host.docker.internal:8080/api}
       BACKEND_API_KEY: ${BACKEND_API_KEY:-agent-secret-key-change-me}
+      DATABASE_URL: ${DATABASE_URL}
       AGENT_PORT: 8000
     ports:
       - "8000:8000"
