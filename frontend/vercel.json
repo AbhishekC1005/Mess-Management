@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "http://mess-alb-1806438419.ap-south-1.elb.amazonaws.com/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
