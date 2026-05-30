@@ -1,0 +1,22 @@
+services:
+  agent:
+    build: .
+    container_name: mess-agent
+    env_file:
+      - .env
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      NVIDIA_NIM_API_KEY: ${NVIDIA_NIM_API_KEY}
+      NVIDIA_NIM_MODEL: ${NVIDIA_NIM_MODEL:-meta/llama-3.1-70b-instruct}
+      BACKEND_API_URL: ${BACKEND_API_URL:-http://host.docker.internal:8080/api}
+      BACKEND_API_KEY: ${BACKEND_API_KEY:-agent-secret-key-change-me}
+      AGENT_PORT: 8000
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s

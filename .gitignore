@@ -1,0 +1,96 @@
+# ==========================================
+# Mess Management System Gitignore
+# ==========================================
+
+# --- OS / IDE Files ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDEs
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.iml
+.classpath
+.project
+.settings/
+.factorypath
+
+# --- Secrets, Credentials, & Environment ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.p12
+*.jks
+credentials*.json
+client_secret*.json
+secrets.json
+secrets.yml
+local.properties
+config.json
+
+# --- Backend (Java / Maven) ---
+**/target/
+**/*.class
+**/*.jar
+**/*.war
+**/*.ear
+**/*.zip
+**/*.tar.gz
+.mvn/
+nbproject/
+*.releaseBackup
+*.tag
+dependency-reduced-pom.xml
+
+# --- Frontend (React / Vite / Node) ---
+**/node_modules/
+**/dist/
+**/dist-ssr/
+*.local
+.eslintcache
+.parcel-cache
+.yarn/
+.pnpm-store/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Agent (Python) ---
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.poetry/
+.pytest_cache/
+.mypy_cache/
+.tox/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Logs ---
+**/logs/
+*.log
